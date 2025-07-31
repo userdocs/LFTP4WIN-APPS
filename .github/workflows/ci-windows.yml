@@ -1,0 +1,68 @@
+name: ci - windows binary build
+
+on:
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    env:
+      cygwin_path: "cygwin"
+      source_branch: ${{ inputs.source_branch }}
+      source_repo: ${{ inputs.source_repo }}
+
+    steps:
+      - run: git config --global core.autocrlf input
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: sevenzip
+        shell: bash
+        run: |
+          sevenzip="$(curl -sL https://sourceforge.net/projects/sevenzip/best_release.json | jq -r '.platform_releases.windows.filename')"
+          sevenzip_filename="${sevenzip#/7-Zip/}"
+          first=${sevenzip_filename%/*} first=${first/\./}
+
+          echo "https://www.7-zip.org/a/7z${first}-extra.7z"
+
+          curl -L "https://www.7-zip.org/a/7z${first}-extra.7z" -o "sevenzip.7z"
+          7z x "sevenzip.7z" -o"sevenzip_tmp"
+
+          mkdir -p "lftp4win_bin"
+          cp -f "sevenzip_tmp/x64/"* "lftp4win_bin"
+
+
+      - name: unrarall
+        shell: bash
+        run: curl -L https://raw.githubusercontent.com/arfoll/unrarall/refs/heads/master/unrarall -o "lftp4win_bin/unrarall"
+
+      - name: Install ci-cygwin-installer.cmd
+        run: .\ci-cygwin-installer.cmd
+
+      - name: Build mtr
+        run: .\cygwin\bin\bash.exe -l ci-mtr-windows-cygwin-build.bash "$env:cygwin_path" "https://github.com/traviscross/mtr.git" "master"
+
+      - name: Build passh
+        run: .\cygwin\bin\bash.exe -l ci-passh-windows-cygwin-build.bash "$env:cygwin_path" "https://github.com/clarkwang/passh.git" "master"
+
+      - name: Build cksfv
+        run: .\cygwin\bin\bash.exe -l ci-cksfv-windows-cygwin-build.bash "$env:cygwin_path" "https://gitlab.com/heikkiorsila/cksfv.git" "master"
+
+      - name: Build unrar
+        run: .\cygwin\bin\bash.exe -l ci-unrar-windows-cygwin-build.bash "$env:cygwin_path" "https://www.rarlab.com/rar/unrarsrc-7.1.10.tar.gz"
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            lftp4win_bin/*
+          
+      - name: "Release - Create artifacts"
+        uses: actions/upload-artifact@v4
+        with:
+          name: "lftp4win_bin"
+          path: lftp4win_bin/*
