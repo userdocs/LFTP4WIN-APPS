@@ -35,6 +35,16 @@ jobs:
           mkdir -p "lftp4win_bin"
           cp -f "sevenzip_tmp/x64/"* "lftp4win_bin"
 
+      - name: iperf
+        shell: bash
+        run: | 
+          # iperf3 
+          curl -LO "https://github.com/userdocs/iperf3-static/releases/latest/download/iperf3-amd64-win-openssl.zip"
+          unzip -oq "iperf3-amd64-win-openssl.zip" -d "lftp4win_bin"
+
+          # iperf2
+          iperf_url="$(curl -sL https://sourceforge.net/projects/iperf2/best_release.json | jq -r '.platform_releases.windows.filename')"
+          curl -L https://sourceforge.net/projects/iperf2/files/${iperf_url} -o "lftp4win_bin/iperf.exe"
 
       - name: unrarall
         shell: bash
