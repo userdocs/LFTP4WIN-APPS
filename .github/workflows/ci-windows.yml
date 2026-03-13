@@ -16,7 +16,7 @@ jobs:
       - run: git config --global core.autocrlf input
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
@@ -66,13 +66,13 @@ jobs:
         run: .\cygwin\bin\bash.exe -l ci-unrar-windows-cygwin-build.bash "$env:cygwin_path" "https://www.rarlab.com/rar/unrarsrc-7.1.10.tar.gz"
 
       - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v4.1.0
         with:
           subject-path: |
             lftp4win_bin/*
           
       - name: "Release - Create artifacts"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: "lftp4win_bin"
           path: lftp4win_bin/*
