@@ -35,7 +35,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: userdocs/gh-cli-workflow-reruns/actions/auto-rerun-failed@12505905c3e2e0039ffa4376f315aa869ef5b8c3 # main
+      - uses: userdocs/gh-cli-workflow-reruns/actions/auto-rerun-failed@2125730bc0a27f0a000f6664c88c3cb191a4431b # main
         with:
           run_id: ${{ inputs.run_id }}
           attempts: ${{ inputs.attempts }}
