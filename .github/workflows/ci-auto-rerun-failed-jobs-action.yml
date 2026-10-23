@@ -26,7 +26,7 @@ jobs:
     name: rerun - attempt ${{ inputs.attempts }}
     permissions:
       actions: write
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     env:
       GH_TOKEN: "${{ secrets.AUTO_RERUN || github.token }}"
     steps:
@@ -35,7 +35,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: userdocs/gh-cli-workflow-reruns/actions/auto-rerun-failed@12505905c3e2e0039ffa4376f315aa869ef5b8c3 # main
+      - uses: userdocs/gh-cli-workflow-reruns/actions/auto-rerun-failed@ec753e8a066f203bbf51ddeb59aec94fa1ddd699 # main
         with:
           run_id: ${{ inputs.run_id }}
           attempts: ${{ inputs.attempts }}
