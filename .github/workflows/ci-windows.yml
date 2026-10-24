@@ -23,13 +23,10 @@ jobs:
       - name: sevenzip
         shell: bash
         run: |
-          sevenzip="$(curl -sL https://sourceforge.net/projects/sevenzip/best_release.json | jq -r '.platform_releases.windows.filename')"
-          sevenzip_filename="${sevenzip#/7-Zip/}"
-          first=${sevenzip_filename%/*} first=${first/\./}
+          sevenzip_tag="$(curl -fsSL https://api.github.com/repos/ip7z/7zip/releases/latest | jq -er '.tag_name')"
+          sevenzip_version="${sevenzip_tag//./}"
 
-          echo "https://www.7-zip.org/a/7z${first}-extra.7z"
-
-          curl -L "https://www.7-zip.org/a/7z${first}-extra.7z" -o "sevenzip.7z"
+          curl -fL "https://github.com/ip7z/7zip/releases/download/${sevenzip_tag}/7z${sevenzip_version}-extra.7z" -o "sevenzip.7z"
           7z x "sevenzip.7z" -o"sevenzip_tmp"
 
           mkdir -p "lftp4win_bin"
@@ -37,7 +34,7 @@ jobs:
 
       - name: iperf
         shell: bash
-        run: | 
+        run: |
           # iperf3 
           curl -LO "https://github.com/userdocs/iperf3-static/releases/latest/download/iperf3-amd64-win-openssl.zip"
           unzip -oq "iperf3-amd64-win-openssl.zip" -d "lftp4win_bin"
@@ -70,7 +67,7 @@ jobs:
         with:
           subject-path: |
             lftp4win_bin/*
-          
+
       - name: "Release - Create artifacts"
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
